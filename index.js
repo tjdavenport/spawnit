@@ -7,7 +7,7 @@ program
 program
   .command('dev')
   .description('Start a development environment for single page Javascript applications.')
-  .option('-p, --port [number]', 'Port number the development server will listen on.')
+  .option('-p, --port <n>', 'Port number the development server will listen on.', parseInt)
   .action(commands.dev);
 
 program.parse(process.argv);
