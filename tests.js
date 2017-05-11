@@ -1,7 +1,10 @@
+const fs = require('fs');
+const vm = require('vm');
 const app = require('./lib/app');
 const assert = require('assert');
 const request = require('request');
 const commands = require('./lib/commands');
+const makeBrowserify = require('./lib/makeBrowserify');
 
 describe('spawnit', () => {
 
@@ -23,6 +26,36 @@ describe('spawnit', () => {
         assert(body.message === 'it works!');
         done();
       });
+    });
+
+    it('Should have a bundle endpoint', (done) => {
+      const contents = fs.readFileSync('./fixture/index.js');
+
+      app.set('browserify', makeBrowserify({
+        entries: ['./fixture/index.js'],
+      }));
+
+      appRequest('/bundle', (err, res, body) => {
+        assert(body.includes(contents));
+        done();
+      });
+    });
+
+    it('Should display bundle errors', (done) => {
+      let b = makeBrowserify({
+        entries: ['./fixture/error-index.js'],
+      });
+      app.set('browserify', b);
+
+      b.bundle((err, buff) => {
+
+        appRequest('/bundle', (reqErr, res, body) => {
+          assert(body.includes(err));
+          done();
+        });
+
+      });
+
     });
 
     after('Close the http server', (done) => {
