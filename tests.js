@@ -21,7 +21,7 @@ describe('spawnit', () => {
     });
 
     it('Should have a status endpoint', (done) => {
-      appRequest('/status', (err, res, body) => {
+      appRequest('/_spawnit/status', (err, res, body) => {
         assert(res.statusCode === 200);
         assert(body.message === 'it works!');
         done();
@@ -35,13 +35,13 @@ describe('spawnit', () => {
         entries: ['./fixture/index.js'],
       }));
 
-      appRequest('/bundle', (err, res, body) => {
+      appRequest('/_spawnit/bundle', (err, res, body) => {
         assert(body.includes(contents));
         done();
       });
     });
 
-    it('Should display bundle errors', (done) => {
+    it('Should send bundle errors', (done) => {
       let b = makeBrowserify({
         entries: ['./fixture/error-index.js'],
       });
@@ -49,8 +49,9 @@ describe('spawnit', () => {
 
       b.bundle((err, buff) => {
 
-        appRequest('/bundle', (reqErr, res, body) => {
-          assert(body.includes(err));
+        appRequest('/_spawnit/bundle', (reqErr, res, body) => {
+          assert(res.statusCode === 500);
+          assert(body.message.includes(err.message));
           done();
         });
 
