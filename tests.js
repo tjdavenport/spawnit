@@ -1,8 +1,9 @@
 const fs = require('fs');
-const vm = require('vm');
 const app = require('./lib/app');
 const assert = require('assert');
 const request = require('request');
+const makeCss = require('./lib/makeCss');
+const Notifier = require('./lib/Notifier');
 const commands = require('./lib/commands');
 const makeBrowserify = require('./lib/makeBrowserify');
 
@@ -41,22 +42,37 @@ describe('spawnit', () => {
       });
     });
 
-    it('Should send bundle errors', (done) => {
+    it('Should send and log bundle errors', (done) => {
       let b = makeBrowserify({
         entries: ['./fixture/error-index.js'],
       });
       app.set('browserify', b);
+      app.set('notifier', new Notifier('array'));
 
       b.bundle((err, buff) => {
 
         appRequest('/_spawnit/bundle', (reqErr, res, body) => {
           assert(res.statusCode === 500);
           assert(body.message.includes(err.message));
+          assert(app.get('notifier').notifications[0].message === err.message);
           done();
         });
 
       });
 
+    });
+
+    it.only('Should have a css endpoint', (done) => {
+      const cssOpts = {
+        file: './fixture/styles.scss',
+      };
+      app.set('css', () => { return makeCss(cssOpts); });
+
+      appRequest('/_spawnit/css', (err, res, body) => {
+        assert(body.includes('999px'));
+        assert(body.includes('.foo.bar'));
+        done();
+      });
     });
 
     after('Close the http server', (done) => {
