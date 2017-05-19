@@ -75,7 +75,7 @@ describe('spawnit', () => {
       });
     });
 
-    it.only('Should send and log sass errors', (done) => {
+    it('Should send and log sass errors', (done) => {
       const css = () => {
         return makeCss({
           file: './fixture/styles-error.scss',
@@ -91,6 +91,15 @@ describe('spawnit', () => {
           assert(app.get('notifier').notifications[0].message === err.message);
           done();
         });
+      });
+    });
+
+    it('Should catch all other requests and respond with html', (done) => {
+      const html = '<html><head><title>spawnit</title></head><body></body></html>';
+      app.set('html', html);
+      appRequest('/foo/bar/baz', (err, res, body) => {
+        assert(body === html);
+        done();
       });
     });
 
