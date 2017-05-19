@@ -30,10 +30,10 @@ describe('spawnit', () => {
     });
 
     it('Should have a bundle endpoint', (done) => {
-      const contents = fs.readFileSync('./fixture/index.js');
+      const contents = fs.readFileSync('./fixture/express-server/index.js');
 
       app.set('browserify', makeBrowserify({
-        entries: ['./fixture/index.js'],
+        entries: ['./fixture/express-server/index.js'],
       }));
 
       appRequest('/_spawnit/bundle', (err, res, body) => {
@@ -44,7 +44,7 @@ describe('spawnit', () => {
 
     it('Should send and log bundle errors', (done) => {
       let b = makeBrowserify({
-        entries: ['./fixture/error-index.js'],
+        entries: ['./fixture/express-server/error-index.js'],
       });
       app.set('browserify', b);
       app.set('notifier', new Notifier('array'));
@@ -64,7 +64,7 @@ describe('spawnit', () => {
 
     it('Should have a css endpoint', (done) => {
       const cssOpts = {
-        file: './fixture/styles.scss',
+        file: './fixture/express-server/styles.scss',
       };
       app.set('css', () => { return makeCss(cssOpts); });
 
@@ -78,7 +78,7 @@ describe('spawnit', () => {
     it('Should send and log sass errors', (done) => {
       const css = () => {
         return makeCss({
-          file: './fixture/styles-error.scss',
+          file: './fixture/express-server/styles-error.scss',
         });
       };
       app.set('css', css);
@@ -108,5 +108,8 @@ describe('spawnit', () => {
     });
   });
 
+  describe('console application', () => {
+
+  });
 
 });
