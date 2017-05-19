@@ -62,7 +62,7 @@ describe('spawnit', () => {
 
     });
 
-    it.only('Should have a css endpoint', (done) => {
+    it('Should have a css endpoint', (done) => {
       const cssOpts = {
         file: './fixture/styles.scss',
       };
@@ -72,6 +72,25 @@ describe('spawnit', () => {
         assert(body.includes('999px'));
         assert(body.includes('.foo.bar'));
         done();
+      });
+    });
+
+    it.only('Should send and log sass errors', (done) => {
+      const css = () => {
+        return makeCss({
+          file: './fixture/styles-error.scss',
+        });
+      };
+      app.set('css', css);
+      app.set('notifier', new Notifier('array'));
+
+      css().catch((err) => {
+        appRequest('/_spawnit/css', (reqErr, res, body) => {
+          assert(res.statusCode === 500);
+          assert(body.message.includes(err.message));
+          assert(app.get('notifier').notifications[0].message === err.message);
+          done();
+        });
       });
     });
 
