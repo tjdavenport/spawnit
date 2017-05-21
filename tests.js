@@ -4,22 +4,22 @@ const app = require('./lib/app');
 const assert = require('assert');
 const request = require('request');
 const makeCss = require('./lib/makeCss');
+const getHtml = require('./lib/getHtml');
 const Notifier = require('./lib/Notifier');
 const commands = require('./lib/commands');
 const child_process = require('child_process');
 const makeBrowserify = require('./lib/makeBrowserify');
 
 describe('spawnit', () => {
+  let appRequest = request.defaults({
+    baseUrl: 'http://localhost:1337',
+    json: true,
+  });
 
   describe('express server', () => {
     let server;
-    let appRequest;
 
     before('Start the http server', (done) => {
-      appRequest = request.defaults({
-        baseUrl: 'http://localhost:1337',
-        json: true,
-      });
       server = app.listen(1337, done);
     });
 
@@ -112,24 +112,49 @@ describe('spawnit', () => {
 
   describe('console application', () => {
     it('Should create a js development environment', (done) => {
+      const cwd = path.join(process.cwd(), 'fixture', 'console-application');
       const spawnit = child_process.spawn('node', ['../../index.js'], {
-        cwd: path.join(process.cwd(), 'fixture', 'console-application'),
+        cwd: cwd,
       });
 
-      spawnit.on('error', (err) => {
+      spawnit.once('error', (err) => {
         throw err;
       });
 
-      spawnit.stdout.on('data', (data) => {
-        console.log(data.toString());
-      });
+      spawnit.stdout.once('data', (data) => {
+        const html = getHtml(cwd);
+        const servedHtml = new Promise((resolve, reject) => {
+          appRequest('/foo/bar/baz', (err, res, body) => {
+            if (err) {
+              throw err;
+            }
+            resolve(body);
+          })
+        });
+        const servedBundle = new Promise((resolve, reject) => {
+          appRequest('/_spawnit/bundle', (err, res, body) => {
+            if (err) {
+              throw err;
+            }
+            resolve(body);
+          });
+        });
+        const servedCss = new Promise((resolve, reject) => {
+          appRequest('/_spawnit/css', (err, res, body) => {
+            if (err) {
+              throw err;
+            }
+            resolve(body);
+          })
+        });
 
-      spawnit.stderr.on('data', (data) => {
-        console.log(data);
-      });
-
-      spawnit.on('close', (code) => {
-        console.log(code);
+        Promise.all([html, servedHtml, servedBundle, servedCss]).then((values) => {
+          assert(values[0] === values[1]);
+          assert(values[2].includes('alert(\'foo bar baz\');'));
+          assert(values[3].includes('font-size: 999px;'));
+          spawnit.kill();
+          done();
+        });
       });
     });
   });
