@@ -110,7 +110,7 @@ describe('spawnit', () => {
     });
   });
 
-  describe.only('console application', () => {
+  describe('console application', () => {
     it('Should create a js development environment', (done) => {
       const spawnit = child_process.spawn('node', ['../../index.js'], {
         cwd: path.join(process.cwd(), 'fixture', 'console-application'),
