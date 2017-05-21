@@ -7,3 +7,5 @@ program.option('-n, --notifier [driver]', 'Error notification driver to use (des
 program.parse(process.argv);
 
 commands.dev(program);
+
+module.exports = program;

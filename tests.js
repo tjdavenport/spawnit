@@ -1,10 +1,12 @@
 const fs = require('fs');
+const path = require('path');
 const app = require('./lib/app');
 const assert = require('assert');
 const request = require('request');
 const makeCss = require('./lib/makeCss');
 const Notifier = require('./lib/Notifier');
 const commands = require('./lib/commands');
+const child_process = require('child_process');
 const makeBrowserify = require('./lib/makeBrowserify');
 
 describe('spawnit', () => {
@@ -108,8 +110,28 @@ describe('spawnit', () => {
     });
   });
 
-  describe('console application', () => {
+  describe.only('console application', () => {
+    it('Should create a js development environment', (done) => {
+      const spawnit = child_process.spawn('node', ['../../index.js'], {
+        cwd: path.join(process.cwd(), 'fixture', 'console-application'),
+      });
 
+      spawnit.on('error', (err) => {
+        throw err;
+      });
+
+      spawnit.stdout.on('data', (data) => {
+        console.log(data.toString());
+      });
+
+      spawnit.stderr.on('data', (data) => {
+        console.log(data);
+      });
+
+      spawnit.on('close', (code) => {
+        console.log(code);
+      });
+    });
   });
 
 });
