@@ -125,25 +125,19 @@ describe('spawnit', () => {
         const html = getHtml(cwd);
         const servedHtml = new Promise((resolve, reject) => {
           appRequest('/foo/bar/baz', (err, res, body) => {
-            if (err) {
-              throw err;
-            }
+            if (err) throw err;
             resolve(body);
           })
         });
         const servedBundle = new Promise((resolve, reject) => {
           appRequest('/_spawnit/bundle', (err, res, body) => {
-            if (err) {
-              throw err;
-            }
+            if (err) throw err;
             resolve(body);
           });
         });
         const servedCss = new Promise((resolve, reject) => {
           appRequest('/_spawnit/css', (err, res, body) => {
-            if (err) {
-              throw err;
-            }
+            if (err) throw err;
             resolve(body);
           })
         });
@@ -155,6 +149,64 @@ describe('spawnit', () => {
           spawnit.kill();
           done();
         });
+      });
+    });
+
+    it('Should respond with a custom index file if it exists', (done) => {
+      const cwd = path.join(process.cwd(), 'fixture', 'console-application', 'custom-index');
+      const html = fs.readFileSync(path.join(cwd, 'index.html'), 'utf8');
+      const spawnit = child_process.spawn('node', ['../../../index.js'], {
+        cwd: cwd,
+      });
+
+      spawnit.once('error', (err) => {
+        throw err;
+      });
+
+      spawnit.stdout.once('data', (data) => {
+
+        appRequest('/foo/bar/baz', (err, res, body) => {
+          if (err) throw err;
+          assert(html === body);
+          spawnit.kill();
+          done();
+        });
+
+      });
+
+    });
+
+    it('Can use custom browserify and sass options', (done) => {
+      const cwd = path.join(process.cwd(), 'fixture', 'console-application', 'custom-index');
+      const spawnit = child_process.spawn('node', ['../../../index.js'], {
+        cwd: cwd,
+      });
+
+      spawnit.once('error', (err) => {
+        if (err) throw err;
+      });
+
+      spawnit.stdout.once('data', (data) => {
+        const servedBundle = new Promise((resolve, reject) => {
+          appRequest('/_spawnit/bundle', (err, res, body) => {
+            if (err) throw err;
+            resolve(body);
+          });
+        });
+        const servedCss = new Promise((resolve, reject) => {
+          appRequest('/_spawnit/css', (err, res, body) => {
+            if (err) throw err;
+            resolve(body);
+          });
+        });
+
+        Promise.all([servedBundle, servedCss]).then((values) => {
+          assert(values[0].includes('custom browserify opts'));
+          assert(values[1].includes('.custom.styles'));
+          spawnit.kill();
+          done();
+        });
+
       });
     });
   });
