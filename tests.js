@@ -20,6 +20,7 @@ describe('spawnit', () => {
     let server;
 
     before('Start the http server', (done) => {
+      app.set('notifier', new Notifier('array'));
       server = app.listen(1337, done);
     });
 
@@ -56,7 +57,7 @@ describe('spawnit', () => {
         appRequest('/_spawnit/bundle', (reqErr, res, body) => {
           assert(res.statusCode === 500);
           assert(body.message.includes(err.message));
-          assert(app.get('notifier').notifications[0].message === err.message);
+          assert(app.get('notifier').notifications.includes(err.message));
           done();
         });
 
@@ -90,7 +91,7 @@ describe('spawnit', () => {
         appRequest('/_spawnit/css', (reqErr, res, body) => {
           assert(res.statusCode === 500);
           assert(body.message.includes(err.message));
-          assert(app.get('notifier').notifications[0].message === err.message);
+          assert(app.get('notifier').notifications.includes(err.message));
           done();
         });
       });
@@ -113,7 +114,7 @@ describe('spawnit', () => {
   describe('console application', () => {
     it('Should create a js development environment', (done) => {
       const cwd = path.join(process.cwd(), 'fixture', 'console-application');
-      const spawnit = child_process.spawn('node', ['../../index.js'], {
+      const spawnit = child_process.spawn('node', ['../../index.js', '-n'], {
         cwd: cwd,
       });
 
@@ -155,7 +156,7 @@ describe('spawnit', () => {
     it('Should respond with a custom index file if it exists', (done) => {
       const cwd = path.join(process.cwd(), 'fixture', 'console-application', 'custom-index');
       const html = fs.readFileSync(path.join(cwd, 'index.html'), 'utf8');
-      const spawnit = child_process.spawn('node', ['../../../index.js'], {
+      const spawnit = child_process.spawn('node', ['../../../index.js', '-n'], {
         cwd: cwd,
       });
 
@@ -178,7 +179,7 @@ describe('spawnit', () => {
 
     it('Can use custom browserify and sass options', (done) => {
       const cwd = path.join(process.cwd(), 'fixture', 'console-application', 'custom-index');
-      const spawnit = child_process.spawn('node', ['../../../index.js'], {
+      const spawnit = child_process.spawn('node', ['../../../index.js', '-n'], {
         cwd: cwd,
       });
 
