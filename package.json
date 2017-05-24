@@ -2,6 +2,7 @@
   "name": "spawnit",
   "version": "0.0.1",
   "main": "index.js",
+  "bin": "index.js",
   "repository": "https://github.com/tjdavenport/spawnit.git",
   "author": "Torrance Davenport <tjdavenport2@gmail.com>",
   "license": "MIT",
@@ -12,6 +13,7 @@
     "express": "4.15.2",
     "node-notifier": "^5.1.2",
     "node-sass": "^4.5.2",
+    "opn": "^5.0.0",
     "underscore": "^1.8.3",
     "watchify": "^3.9.0"
   },
