@@ -3,9 +3,9 @@ const path = require('path');
 const app = require('./lib/app');
 const assert = require('assert');
 const request = require('request');
+const Logger = require('./lib/Logger');
 const makeCss = require('./lib/makeCss');
 const getHtml = require('./lib/getHtml');
-const Notifier = require('./lib/Notifier');
 const commands = require('./lib/commands');
 const child_process = require('child_process');
 const makeBrowserify = require('./lib/makeBrowserify');
@@ -20,7 +20,7 @@ describe('spawnit', () => {
     let server;
 
     before('Start the http server', (done) => {
-      app.set('notifier', new Notifier('array'));
+      app.set('logger', new Logger('array'));
       server = app.listen(1337, done);
     });
 
@@ -50,14 +50,14 @@ describe('spawnit', () => {
         entries: ['./fixture/express-server/error-index.js'],
       });
       app.set('browserify', b);
-      app.set('notifier', new Notifier('array'));
+      app.set('logger', new Logger('array'));
 
       b.bundle((err, buff) => {
 
         appRequest('/_spawnit/bundle', (reqErr, res, body) => {
           assert(res.statusCode === 500);
           assert(body.message.includes(err.message));
-          assert(app.get('notifier').notifications.includes(err.message));
+          assert(app.get('logger').logs.includes(err.message));
           done();
         });
 
@@ -85,13 +85,13 @@ describe('spawnit', () => {
         });
       };
       app.set('css', css);
-      app.set('notifier', new Notifier('array'));
+      app.set('logger', new Logger('array'));
 
       css().catch((err) => {
         appRequest('/_spawnit/css', (reqErr, res, body) => {
           assert(res.statusCode === 500);
           assert(body.message.includes(err.message));
-          assert(app.get('notifier').notifications.includes(err.message));
+          assert(app.get('logger').logs.includes(err.message));
           done();
         });
       });
