@@ -7,6 +7,7 @@ const Logger = require('./lib/Logger');
 const makeCss = require('./lib/makeCss');
 const getHtml = require('./lib/getHtml');
 const commands = require('./lib/commands');
+const makeSocket = require('socket.io-client');
 const child_process = require('child_process');
 const makeBrowserify = require('./lib/makeBrowserify');
 
@@ -112,18 +113,27 @@ describe('spawnit', () => {
   });
 
   describe('console application', () => {
-    it('Should create a js development environment', (done) => {
-      const cwd = path.join(process.cwd(), 'fixture', 'console-application');
-      const spawnit = child_process.spawn('node', ['../../index.js', '-n'], {
-        cwd: cwd,
+    function fixture() {
+      return path.join(...[process.cwd(), 'fixture', 'console-application'].concat(Array.from(arguments)));
+    }
+
+    function makeSpawnit() { // can only call this once for some reason, otherwise we hit timeout. Possible Node bug?
+      const spawnit = child_process.spawn('node', [path.join(process.cwd(), 'index.js'), '-n'], {
+        cwd: fixture.apply(null, Array.from(arguments)),
       });
 
       spawnit.once('error', (err) => {
         throw err;
       });
 
+      return spawnit;
+    }
+
+    it('Should create a js development environment', (done) => {
+      const spawnit = makeSpawnit();
+
       spawnit.stdout.once('data', (data) => {
-        const html = getHtml(cwd);
+        const html = getHtml(process.cwd());
         const servedHtml = new Promise((resolve, reject) => {
           appRequest('/foo/bar/baz', (err, res, body) => {
             if (err) throw err;
@@ -154,15 +164,8 @@ describe('spawnit', () => {
     });
 
     it('Should respond with a custom index file if it exists', (done) => {
-      const cwd = path.join(process.cwd(), 'fixture', 'console-application', 'custom-index');
-      const html = fs.readFileSync(path.join(cwd, 'index.html'), 'utf8');
-      const spawnit = child_process.spawn('node', ['../../../index.js', '-n'], {
-        cwd: cwd,
-      });
-
-      spawnit.once('error', (err) => {
-        throw err;
-      });
+      const html = fs.readFileSync(fixture('custom-index', 'index.html'), 'utf8');
+      const spawnit = makeSpawnit('custom-index');
 
       spawnit.stdout.once('data', (data) => {
 
@@ -178,14 +181,7 @@ describe('spawnit', () => {
     });
 
     it('Can use custom browserify and sass options', (done) => {
-      const cwd = path.join(process.cwd(), 'fixture', 'console-application', 'custom-index');
-      const spawnit = child_process.spawn('node', ['../../../index.js', '-n'], {
-        cwd: cwd,
-      });
-
-      spawnit.once('error', (err) => {
-        if (err) throw err;
-      });
+      const spawnit = makeSpawnit('custom-index');
 
       spawnit.stdout.once('data', (data) => {
         const servedBundle = new Promise((resolve, reject) => {
@@ -209,6 +205,17 @@ describe('spawnit', () => {
         });
 
       });
+    });
+
+    it('Starts a server for web socket communication', (done) => {
+      const socket = makeSocket('ws://localhost:1338');
+
+      socket.on('connect', () => {
+        spawnit.kill();
+        done();
+      });
+
+      const spawnit = makeSpawnit();
     });
   });
 
