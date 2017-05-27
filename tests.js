@@ -7,7 +7,7 @@ const Logger = require('./lib/Logger');
 const makeCss = require('./lib/makeCss');
 const getHtml = require('./lib/getHtml');
 const commands = require('./lib/commands');
-const makeSocket = require('socket.io-client');
+const Client = require('websocket').client;
 const child_process = require('child_process');
 const makeBrowserify = require('./lib/makeBrowserify');
 
@@ -154,10 +154,10 @@ describe('spawnit', () => {
         });
 
         Promise.all([html, servedHtml, servedBundle, servedCss]).then((values) => {
+          spawnit.kill();
           assert(values[0] === values[1]);
           assert(values[2].includes('alert(\'foo bar baz\');'));
           assert(values[3].includes('font-size: 999px;'));
-          spawnit.kill();
           done();
         });
       });
@@ -169,10 +169,12 @@ describe('spawnit', () => {
 
       spawnit.stdout.once('data', (data) => {
 
-        appRequest('/foo/bar/baz', (err, res, body) => {
+        request({ 
+          uri: 'http://localhost:1337/foo/bar/baz', 
+        }, (err, res, body) => {
+          spawnit.kill();
           if (err) throw err;
           assert(html === body);
-          spawnit.kill();
           done();
         });
 
@@ -198,9 +200,9 @@ describe('spawnit', () => {
         });
 
         Promise.all([servedBundle, servedCss]).then((values) => {
+          spawnit.kill();
           assert(values[0].includes('custom browserify opts'));
           assert(values[1].includes('.custom.styles'));
-          spawnit.kill();
           done();
         });
 
@@ -208,14 +210,20 @@ describe('spawnit', () => {
     });
 
     it('Starts a server for web socket communication', (done) => {
-      const socket = makeSocket('ws://localhost:1338');
+      const client = new Client();
 
-      socket.on('connect', () => {
+      client.on('connect', () => {
         spawnit.kill();
         done();
       });
 
       const spawnit = makeSpawnit();
+      spawnit.stdout.on('data', (data) => {
+        if (data.toString().includes('1338')) {
+          client.connect('ws://localhost:1338');
+        }
+      });
+
     });
   });
 
