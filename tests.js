@@ -17,7 +17,7 @@ describe('spawnit', () => {
     json: true,
   });
 
-  describe('express server', () => {
+  describe.only('express server', () => {
     let server;
 
     before('Start the http server', (done) => {
@@ -29,6 +29,13 @@ describe('spawnit', () => {
       appRequest('/_spawnit/status', (err, res, body) => {
         assert(res.statusCode === 200);
         assert(body.message === 'it works!');
+        done();
+      });
+    });
+
+    it.only('Should have a remote script endpoint', (done) => {
+      appRequest('/_spawnit/remote', (err, res, body) => {
+        console.log(body);
         done();
       });
     });
