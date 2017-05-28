@@ -17,11 +17,12 @@ describe('spawnit', () => {
     json: true,
   });
 
-  describe.only('express server', () => {
+  describe('express server', () => {
     let server;
 
     before('Start the http server', (done) => {
       app.set('logger', new Logger('array'));
+      app.set('opts', { wssPort: 1338, });
       server = app.listen(1337, done);
     });
 
@@ -33,9 +34,8 @@ describe('spawnit', () => {
       });
     });
 
-    it.only('Should have a remote script endpoint', (done) => {
+    it('Should have a remote script endpoint', (done) => {
       appRequest('/_spawnit/remote', (err, res, body) => {
-        console.log(body);
         done();
       });
     });
