@@ -4,6 +4,7 @@ const app = require('./lib/app');
 const assert = require('assert');
 const request = require('request');
 const Logger = require('./lib/Logger');
+const remote = require('./lib/remote');
 const makeCss = require('./lib/makeCss');
 const getHtml = require('./lib/getHtml');
 const commands = require('./lib/commands');
@@ -16,13 +17,22 @@ describe('spawnit', () => {
     baseUrl: 'http://localhost:1337',
     json: true,
   });
+  function fixture() {
+    return path.join(...[process.cwd(), 'fixture'].concat(Array.from(arguments)));
+  }
 
   describe('express server', () => {
     let server;
 
     before('Start the http server', (done) => {
       app.set('logger', new Logger('array'));
-      app.set('opts', { wssPort: 1338, });
+      app.set('opts', {
+        wssPort: 1338,
+        scripts: [
+          fixture('script1.js'),
+          fixture('script2.js'),
+        ]
+      });
       server = app.listen(1337, done);
     });
 
@@ -36,6 +46,15 @@ describe('spawnit', () => {
 
     it('Should have a remote script endpoint', (done) => {
       appRequest('/_spawnit/remote', (err, res, body) => {
+        assert(body.includes(remote.toString()));
+        done();
+      });
+    });
+
+    it('Should have a vendor scripts endpoint', (done) => {
+      appRequest('/_spawnit/scripts', (err, res, body) => {
+        assert(body.includes('alert(\'foo\')'));
+        assert(body.includes('alert(\'bar\')'));
         done();
       });
     });
