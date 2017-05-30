@@ -2,7 +2,9 @@
   "name": "spawnit",
   "version": "0.0.3",
   "main": "index.js",
-  "bin": "./bin/spawnit",
+  "bin": {
+    "spawnit": "./bin/spawnit"
+  },
   "repository": "https://github.com/tjdavenport/spawnit.git",
   "author": "Torrance Davenport <tjdavenport2@gmail.com>",
   "license": "MIT",
