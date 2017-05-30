@@ -1,6 +1,6 @@
 {
   "name": "spawnit",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "index.js",
   "bin": "./bin/spawnit",
   "repository": "https://github.com/tjdavenport/spawnit.git",
