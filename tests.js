@@ -53,6 +53,7 @@ describe('spawnit', () => {
 
     it('Should have a vendor scripts endpoint', (done) => {
       appRequest('/_spawnit/scripts', (err, res, body) => {
+        assert(body.includes('sourceMappingURL'));
         assert(body.includes('alert(\'foo\')'));
         assert(body.includes('alert(\'bar\')'));
         done();
