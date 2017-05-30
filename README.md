@@ -23,7 +23,9 @@ with Browserify, and script concatenation. No boilerplate is needed to start cre
 ```
 
 ## Configuration File
-Spawnit will look for a `spawnit-config.js` file in the current working directory. The file should export an object with configuration keys/values. All CLI options can be set in this file. Example:
+Spawnit will look for a `spawnit-config.js` file in the current working directory. The file should export an object with configuration keys/values. All CLI options can be set in this file. [Default Browserify](https://github.com/tjdavenport/spawnit/blob/master/lib/makeBrowserify.js) and [node-sass](https://github.com/tjdavenport/spawnit/blob/master/lib/makeCss.js) options can be found in `./lib`.
+
+Example:
 
 ``` javascript
 // spawnit-config.js
