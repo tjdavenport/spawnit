@@ -78,3 +78,7 @@ Spawnit assumes that you're developing an SPA, so the default body only contains
 -->
 <script src="/_spawnit/remote"></script>
 ```
+## Roadmap
+1. Get coveralls badge working
+2. Add plugins config option to allow for complete customization of the expressjs server.
+3. Add Webdriver support?
