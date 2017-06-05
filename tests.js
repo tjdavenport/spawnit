@@ -81,11 +81,10 @@ describe('spawnit', () => {
       app.set('logger', new Logger('array'));
 
       b.bundle((err, buff) => {
-
         appRequest('/_spawnit/bundle', (reqErr, res, body) => {
           assert(res.statusCode === 500);
           assert(body.message.includes(err.message));
-          assert(app.get('logger').logs.includes(err.message));
+          assert(app.get('logger').logs.includes(err.annotated));
           done();
         });
 
