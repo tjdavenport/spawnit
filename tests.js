@@ -84,7 +84,7 @@ describe('spawnit', () => {
         appRequest('/_spawnit/bundle', (reqErr, res, body) => {
           assert(res.statusCode === 500);
           assert(body.message.includes(err.message));
-          assert(app.get('logger').logs.includes(err.annotated));
+          assert(app.get('logger').logs.includes(err.toString()));
           done();
         });
 
