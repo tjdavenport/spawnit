@@ -71,7 +71,7 @@ Spawnit assumes that you're developing an SPA, so the default body only contains
 <!-- this will load rendered css from the server -->
 <link id="_spawnitcss" rel="stylesheet" href="/_spawnit/css">
 <!-- this will load concatenated scripts defined in the config file -->
-<script src="/_spawnit/bundle"></script>
+<script src="/_spawnit/scripts"></script>
 <!-- this will load the compiled Browserify bundle -->
 <script src="/_spawnit/bundle"></script>
 <!--
