@@ -41,6 +41,14 @@ module.exports = {
    * These options will be passed to node-sass.render
    */
   nodeSassOpts: {},
+  /**
+   * These options will be passed to https.createServer
+   */
+  ssl: {
+    key: fs.readFileSync('./server.key'),
+    cert: fs.readFileSync('./server.crt'),
+    passphrase: 'foobarbaz',
+  },
   errorNotify: false,
   /**
    * These scripts will be concatenated with sourcemaps. 
