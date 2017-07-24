@@ -251,6 +251,26 @@ describe('spawnit', () => {
       });
 
     });
+
+    it('Supports ssl', (done) => {
+      const spawnit = makeSpawnit('ssl');
+      const secureReq = request.defaults({
+        baseUrl: 'https://localhost:1337',
+        json: true,
+      });
+
+      spawnit.stdout.once('data', (data) => {
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+        secureReq('/_spawnit/status', (err, res, body) => {
+          if (err) throw err;
+          assert(body.message === 'it works!');
+          process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1"
+          spawnit.kill();
+          done();
+        });
+
+      });
+    });
   });
 
 });
