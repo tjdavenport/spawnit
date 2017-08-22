@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const app = require('./lib/app');
 const assert = require('assert');
 const request = require('request');
 const Logger = require('./lib/Logger');
 const remote = require('./lib/remote');
+const makeApp = require('./lib/makeApp');
 const makeCss = require('./lib/makeCss');
 const getHtml = require('./lib/getHtml');
 const commands = require('./lib/commands');
@@ -23,15 +23,19 @@ describe('spawnit', () => {
 
   describe('express server', () => {
     let server;
+    let app;
 
     before('Start the http server', (done) => {
-      app.set('logger', new Logger('array'));
-      app.set('opts', {
+      app = makeApp({
         wssPort: 1338,
+        logDriver: 'array',
+        browserifyOpts: {
+          entries: ['./fixture/express-server/index.js'],
+        },
         scripts: [
           fixture('script1.js'),
           fixture('script2.js'),
-        ]
+        ],
       });
       server = app.listen(1337, done);
     });
@@ -63,10 +67,6 @@ describe('spawnit', () => {
     it('Should have a bundle endpoint', (done) => {
       const contents = fs.readFileSync('./fixture/express-server/index.js');
 
-      app.set('browserify', makeBrowserify({
-        entries: ['./fixture/express-server/index.js'],
-      }));
-
       appRequest('/_spawnit/bundle', (err, res, body) => {
         assert(body.includes(contents));
         done();
@@ -78,7 +78,6 @@ describe('spawnit', () => {
         entries: ['./fixture/express-server/error-index.js'],
       });
       app.set('browserify', b);
-      app.set('logger', new Logger('array'));
 
       b.bundle((err, buff) => {
         appRequest('/_spawnit/bundle', (reqErr, res, body) => {
@@ -112,7 +111,6 @@ describe('spawnit', () => {
         });
       };
       app.set('css', css);
-      app.set('logger', new Logger('array'));
 
       css().catch((err) => {
         appRequest('/_spawnit/css', (reqErr, res, body) => {
@@ -154,6 +152,19 @@ describe('spawnit', () => {
 
       return spawnit;
     }
+
+    it('Should create static asset endpoints', (done) => {
+      const spawnit = makeSpawnit('static-assets');
+
+      spawnit.stdout.once('data', (data) => {
+        appRequest('/foo/bar/foo.txt', (err, res, body) => {
+          if (err) throw err;
+          assert(body.includes('bar'));
+          spawnit.kill();
+          done();
+        });
+      });
+    });
 
     it('Should create a js development environment', (done) => {
       const spawnit = makeSpawnit();
