@@ -49,6 +49,13 @@ module.exports = {
     cert: fs.readFileSync('./server.crt'),
     passphrase: 'foobarbaz',
   },
+  /**
+   * Define where assets are stored and the route at which
+   * they will be available
+   */
+  staticAssets: [
+    { route: '/foo/bar/fonts', source: './fonts' },
+  ],
   errorNotify: false,
   /**
    * These scripts will be concatenated with sourcemaps. 
