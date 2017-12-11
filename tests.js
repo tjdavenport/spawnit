@@ -29,6 +29,7 @@ describe('spawnit', () => {
       app = makeApp({
         wssPort: 1338,
         logDriver: 'array',
+        misc: () => {  },
         browserifyOpts: {
           entries: ['./fixture/express-server/index.js'],
         },
