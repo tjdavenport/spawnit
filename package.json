@@ -15,6 +15,7 @@
     "concat-with-sourcemaps": "^1.0.4",
     "express": "4.15.2",
     "filewatcher": "^3.0.1",
+    "he": "^1.1.1",
     "node-notifier": "^5.1.2",
     "node-sass": "^4.5.2",
     "opn": "^5.0.0",

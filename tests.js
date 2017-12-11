@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { encode } = require('he');
 const assert = require('assert');
 const request = require('request');
 const Logger = require('./lib/Logger');
@@ -82,7 +83,7 @@ describe('spawnit', () => {
 
       b.bundle((err, buff) => {
         appRequest('/_spawnit/bundle', (reqErr, res, body) => {
-          assert(body.includes(err.message));
+          assert(body.includes(encode(err.toString())));
           assert(app.get('logger').logs.includes(err.toString()));
           done();
         });
