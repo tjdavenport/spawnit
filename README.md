@@ -76,8 +76,7 @@ module.exports = {
    *  see the CLIEngine API documentation here:
    *    https://eslint.org/docs/developer-guide/nodejs-api#cliengine
    */
-  useLinting: false,
-  lintOpts: {  }
+  esLintOpts: {  }
 };
 
 ```

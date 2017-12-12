@@ -11,6 +11,7 @@ const commands = require('./lib/commands');
 const Client = require('websocket').client;
 const child_process = require('child_process');
 const makeBrowserify = require('./lib/makeBrowserify');
+const makeLinter = require('./lib/makeLinter');
 
 describe('spawnit', () => {
   let appRequest = request.defaults({
@@ -36,6 +37,7 @@ describe('spawnit', () => {
           fixture('script1.js'),
           fixture('script2.js'),
         ],
+        misc: function() {},
       });
       server = app.listen(1337, done);
     });
@@ -131,6 +133,33 @@ describe('spawnit', () => {
       });
     });
 
+    it('Should lint files based on cofiguration, erroring ', (done) => {
+      // create a configuration file that must find semicolons and errors when they are missing
+      const configSemisRequired = require('./fixture/express-server/eslint-opts.js');
+      // create a config that doesn't
+      const configNoSemis = require('./fixture/express-server/eslint-opts-no-semis.js');
+
+      app.set('linter', makeLinter(configNoSemis, app.get('logger')));
+      const passTest = app.get('linter').process();
+
+      app.set('linter', makeLinter(configSemisRequired, app.get('logger')));
+      const failTest = app.get('linter').process();
+
+
+      passTest
+        .then((data) => { assert(data); })
+        .catch(() => { assert.fail('pass', 'fail', '"passTest" was expected to pass.'); });
+
+      failTest
+        .then((data)=> { assert.fail('fail', 'pass', '"failTest" was expected to fail.'); })
+        .catch(() => {
+          assert(true);
+          app.set('linter', null);
+          done();
+        });
+
+    });
+
     after('Close the http server', (done) => {
       server.close(done);
     });
@@ -206,8 +235,8 @@ describe('spawnit', () => {
 
       spawnit.stdout.once('data', (data) => {
 
-        request({ 
-          uri: 'http://localhost:1337/foo/bar/baz', 
+        request({
+          uri: 'http://localhost:1337/foo/bar/baz',
         }, (err, res, body) => {
           spawnit.kill();
           if (err) throw err;
@@ -282,6 +311,8 @@ describe('spawnit', () => {
 
       });
     });
+
+
   });
 
 });
