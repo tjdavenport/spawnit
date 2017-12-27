@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/tjdavenport/spawnit.svg?branch=master)](https://travis-ci.org/tjdavenport/spawnit) [![Coverage Status](https://coveralls.io/repos/github/tjdavenport/spawnit/badge.svg?branch=master)](https://coveralls.io/github/tjdavenport/spawnit?branch=master)
 
 Spawnit allows you to start prototyping your Javascript browser application with zero boilerplate. It will start a configurable,
-customizeable expressjs development server that supports live reloading, live css injection, SASS transpilation, bundling 
+customizeable expressjs development server that supports live reloading, live css injection, SASS transpilation, bundling
 with Browserify, and script concatenation. No boilerplate is needed to start creating elaborate single page applications.
 
 ![Demonstration gif](http://i.imgur.com/Q9kaW9d.gif)
@@ -58,7 +58,7 @@ module.exports = {
   ],
   errorNotify: false,
   /**
-   * These scripts will be concatenated with sourcemaps. 
+   * These scripts will be concatenated with sourcemaps.
    * Great for including modules that aren't compatible with bundling.
    */
   scripts: [],
@@ -70,6 +70,13 @@ module.exports = {
     path.join(process.cwd(), 'styles.scss'),
     path.join(process.cwd(), 'styles'),
   ],
+  /**
+   * Define linting rules for `eslint`
+   *  The ESLint::CLIEngine is being used to provide linting.
+   *  see the CLIEngine API documentation here:
+   *    https://eslint.org/docs/developer-guide/nodejs-api#cliengine
+   */
+  esLintOpts: {  }
 };
 
 ```
