@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { encode } = require('he');
 const assert = require('assert');
 const request = require('request');
 const Logger = require('./lib/Logger');
@@ -30,6 +31,7 @@ describe('spawnit', () => {
       app = makeApp({
         wssPort: 1338,
         logDriver: 'array',
+        misc: () => {  },
         browserifyOpts: {
           entries: ['./fixture/express-server/index.js'],
         },
@@ -83,8 +85,7 @@ describe('spawnit', () => {
 
       b.bundle((err, buff) => {
         appRequest('/_spawnit/bundle', (reqErr, res, body) => {
-          assert(res.statusCode === 500);
-          assert(body.message.includes(err.message));
+          assert(body.includes(encode(err.toString())));
           assert(app.get('logger').logs.includes(err.toString()));
           done();
         });
