@@ -235,7 +235,6 @@ describe('spawnit', () => {
       const spawnit = makeSpawnit('custom-index');
 
       spawnit.stdout.once('data', (data) => {
-
         request({
           uri: 'http://localhost:1337/foo/bar/baz',
         }, (err, res, body) => {
@@ -244,7 +243,6 @@ describe('spawnit', () => {
           assert(html === body);
           done();
         });
-
       });
 
     });
