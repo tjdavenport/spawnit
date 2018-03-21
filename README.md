@@ -34,6 +34,11 @@ module.exports = {
   port: 1337,
   wssPort: 1338,
   /**
+   * define the domain that will be used
+   * when the default browser is opened
+   */
+  domain: 'localhost',
+  /**
    * These options will be used to create a Browserify instance
    */
   browserifyOpts: {},
