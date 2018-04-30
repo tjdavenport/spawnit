@@ -63,8 +63,7 @@ module.exports = {
   ],
   errorNotify: false,
   /**
-   * These scripts will be concatenated with sourcemaps.
-   * Great for including modules that aren't compatible with bundling.
+   * These scripts will be made available under /_spawnit/script/... routes
    */
   scripts: [],
   noOpen: false,
@@ -97,8 +96,8 @@ Spawnit assumes that you're developing an SPA, so the default body only contains
 ``` html
 <!-- this will load rendered css from the server -->
 <link id="_spawnitcss" rel="stylesheet" href="/_spawnit/css">
-<!-- this will load concatenated scripts defined in the config file -->
-<script src="/_spawnit/scripts"></script>
+<!-- This will be replaced by script tags that correspond to elements in the scripts option. -->
+<%= scriptTags %>
 <!-- this will load the compiled Browserify bundle -->
 <script src="/_spawnit/bundle"></script>
 <!--
