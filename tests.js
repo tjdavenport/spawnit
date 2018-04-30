@@ -59,11 +59,10 @@ describe('spawnit', () => {
       });
     });
 
-    it('Should have a vendor scripts endpoint', (done) => {
-      appRequest('/_spawnit/scripts', (err, res, body) => {
-        assert(body.includes('sourceMappingURL'));
-        assert(body.includes('alert(\'foo\')'));
-        assert(body.includes('alert(\'bar\')'));
+    it('Should make scripts available', (done) => {
+      const script1 = fs.readFileSync(fixture('script1.js')).toString();
+      appRequest('/_spawnit/script/script1.js', (err, res, body) => {
+        assert(body.includes(script1));
         done();
       });
     });
@@ -222,7 +221,7 @@ describe('spawnit', () => {
 
         Promise.all([html, servedHtml, servedBundle, servedCss]).then((values) => {
           spawnit.kill();
-          assert(values[0] === values[1]);
+          assert(values[1].includes('/_spawnit/script/foobar.js'));
           assert(values[2].includes('alert(\'foo bar baz\');'));
           assert(values[3].includes('font-size: 999px;'));
           done();
