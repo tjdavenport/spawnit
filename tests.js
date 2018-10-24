@@ -310,6 +310,19 @@ describe('spawnit', () => {
       });
     });
 
+    it('Supports before start and stop options', (done) => {
+      assert(!fs.existsSync(fixture('before-start-stop', 'foo.txt')));
+      const spawnit = makeSpawnit('before-start-stop');
+      spawnit.stdout.once('data', data => {
+        assert(fs.existsSync(fixture('before-start-stop', 'foo.txt')));
+        spawnit.on('exit', () => {
+          assert(!fs.existsSync(fixture('before-start-stop', 'foo.txt')));
+          done();
+        });
+        spawnit.kill();
+      });
+    });
+
 
   });
 
