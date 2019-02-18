@@ -1,6 +1,6 @@
 {
   "name": "spawnit",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "main": "index.js",
   "bin": {
     "spawnit": "./bin/spawnit"
